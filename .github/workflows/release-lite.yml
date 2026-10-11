@@ -66,7 +66,13 @@ jobs:
           - os: macos-14
             goos: darwin
             goarch: arm64
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     env:
       CGO_ENABLED: 1
     steps:
@@ -76,6 +82,17 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Install MinGW and the Windows gnu target
+        if: matrix.goos == 'windows'
+        run: |
+          choco install mingw -y
+          rustup target add x86_64-pc-windows-gnu
+
+      - name: Build anydoc archive
+        run: ./scripts/build-anydoc-lib.sh
 
       - uses: actions/download-artifact@v8
         with:
@@ -102,14 +119,22 @@ jobs:
           if [ "${{ matrix.goos }}" = "darwin" ]; then
             export CGO_LDFLAGS="-Wl,-no_warn_duplicate_libraries"
           fi
-          go build -tags "sqlite_fts5" -ldflags="${LDFLAGS}" \
-            -o WeKnora-lite ./cmd/server
+          OUT="WeKnora-lite"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            OUT="WeKnora-lite.exe"
+          fi
+          go build -tags "sqlite_fts5 anydoc" -ldflags="${LDFLAGS}" \
+            -o "${OUT}" ./cmd/server
 
       - name: Package tarball
         run: |
           ARCHIVE="WeKnora-lite_${{ steps.ver.outputs.version }}_${{ matrix.goos }}_${{ matrix.goarch }}"
+          OUT="WeKnora-lite"
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            OUT="WeKnora-lite.exe"
+          fi
           mkdir -p "${ARCHIVE}/web"
-          cp WeKnora-lite "${ARCHIVE}/"
+          cp "${OUT}" "${ARCHIVE}/"
           bash ./scripts/copy-licenses.sh "${ARCHIVE}"
           cp -r web/* "${ARCHIVE}/web/"
           cp .env.lite.example "${ARCHIVE}/"

@@ -20,18 +20,27 @@ fi
 
 # The Rust target triple decides the archive; the directory name mirrors what
 # the cgo LDFLAGS in third_party/anydoc-go expect for that platform.
-target=${TARGET:-$(rustc -vV | sed -n 's/^host: //p')}
+host_target=$(rustc -vV | sed -n 's/^host: //p')
+if [ -n "${TARGET:-}" ]; then
+  target=$TARGET
+elif [[ "$host_target" == *windows* ]]; then
+  # WeKnora's Windows cgo link uses MinGW, which wants libanydoc_go.a.
+  target=x86_64-pc-windows-gnu
+else
+  target=$host_target
+fi
 case "$target" in
   x86_64-apple-darwin) lib_dir=darwin_amd64 ;;
   aarch64-apple-darwin) lib_dir=darwin_arm64 ;;
-  x86_64-pc-windows-msvc) lib_dir=windows_amd64 ;;
+  x86_64-pc-windows-gnu) lib_dir=windows_amd64 ;;
+  x86_64-pc-windows-msvc) lib_dir=windows_amd64_msvc ;;
   x86_64-unknown-linux-gnu) lib_dir=linux_amd64_gnu ;;
   aarch64-unknown-linux-gnu) lib_dir=linux_arm64_gnu ;;
   x86_64-unknown-linux-musl) lib_dir=linux_amd64_musl ;;
   aarch64-unknown-linux-musl) lib_dir=linux_arm64_musl ;;
   *)
     echo "error: unsupported target '$target'." >&2
-    echo "Supported: {x86_64,aarch64}-{apple-darwin,unknown-linux-{gnu,musl}}, x86_64-pc-windows-msvc" >&2
+    echo "Supported: {x86_64,aarch64}-{apple-darwin,unknown-linux-{gnu,musl}}, x86_64-pc-windows-gnu, x86_64-pc-windows-msvc" >&2
     exit 1
     ;;
 esac
@@ -106,6 +115,10 @@ fi
 
 echo "Building anydoc $anydoc_version archive for $target"
 prepare_patched_anydoc
+
+if [ "$target" != "$host_target" ]; then
+  rustup target add "$target"
+fi
 
 # --locked: build exactly the dependency versions in the committed Cargo.lock.
 # That lockfile is what pins the patched pdf-inspector/lopdf, so a silent

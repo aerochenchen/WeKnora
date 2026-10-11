@@ -1,4 +1,4 @@
-.PHONY: help build run test clean docker-build-app docker-build-docreader docker-build-frontend docker-build-all docker-run migrate-up migrate-down docker-restart docker-stop start-all stop-all start-ollama stop-ollama build-images build-images-app build-images-docreader build-images-frontend clean-images check-env list-containers pull-images show-platform dev-start dev-stop dev-restart dev-logs dev-status dev-app dev-frontend docs install-swagger build-lite run-lite package-lite anydoc-lib build-anydoc
+.PHONY: help build run test clean docker-build-app docker-build-docreader docker-build-frontend docker-build-all docker-run migrate-up migrate-down docker-restart docker-stop start-all stop-all start-ollama stop-ollama build-images build-images-app build-images-docreader build-images-frontend clean-images check-env list-containers pull-images show-platform dev-start dev-stop dev-restart dev-logs dev-status dev-app dev-frontend docs install-swagger build-lite run-lite package-lite anydoc-lib build-anydoc build-wenda-tong
 
 # Show help
 help:
@@ -294,7 +294,7 @@ build-prod:
 
 # Build Lite version (single binary, SQLite + in-memory queue)
 # 会先构建前端到 web/，再构建 Go 二进制；SKIP_FRONTEND=1 可跳过前端
-build-lite:
+build-lite: anydoc-lib
 	@if [ -f frontend/package.json ] && [ "$${SKIP_FRONTEND:-}" != "1" ]; then \
 		echo ">> Building frontend for Lite..."; \
 		(cd frontend && npm ci --prefer-offline && npm run build) && \
@@ -310,7 +310,14 @@ build-lite:
 	CGO_ENABLED=1 \
 	CGO_CFLAGS="-Wno-deprecated-declarations" \
 	CGO_LDFLAGS="$$(if [ "$$(uname)" = 'Darwin' ]; then echo '-Wl,-no_warn_duplicate_libraries'; fi)" \
-	go build -tags "sqlite_fts5" -ldflags="-w -s $$LDFLAGS" -o $(BINARY_NAME)-lite $(MAIN_PATH)
+	go build -tags "sqlite_fts5 anydoc" -ldflags="-w -s $$LDFLAGS" -o $(BINARY_NAME)-lite $(MAIN_PATH)
+	mkdir -p deploy/wenda-tong
+	cp $(BINARY_NAME)-lite deploy/wenda-tong/$(BINARY_NAME)-lite
+
+# Build the wenda-tong launcher next to its scripts.
+build-wenda-tong:
+	mkdir -p deploy/wenda-tong
+	go build -o deploy/wenda-tong/wenda-tong ./cmd/wenda-tong
 
 # Run Lite version with .env.lite defaults
 run-lite: build-lite
