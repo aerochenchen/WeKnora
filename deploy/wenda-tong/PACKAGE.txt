@@ -1,0 +1,21 @@
+问答通离线安装介质
+==================
+
+这个目录是一台机器的全部安装文件。安装时不访问互联网，不执行 docker pull，
+不执行 ollama pull，也不检查更新。
+
+包含：
+- WeKnora-lite（或 WeKnora-lite.exe）：页面和问答接口，只听 127.0.0.1:8090
+- wenda-tong（或 wenda-tong.exe）：启动器
+- start.sh / docreader.sh / bootstrap.sh，Windows 上用 start.ps1
+- config.yaml、env
+- wechatopenai/weknora-docreader:wenda-tong 的镜像包
+- bge-m3 的 Ollama 权重，维度 1024
+
+不包含：
+- 聊天模型的权重。聊天地址写在安装后的 ~/.wenda-tong/llm.json，可以是本机、内网或互联网上的 OpenAI 兼容接口
+- Docker Desktop 安装包
+- Ollama 安装包
+- 文书通的 setup.exe
+
+打包脚本会在下面填写每个文件的 SHA256。权重和镜像很大，不放进 git。

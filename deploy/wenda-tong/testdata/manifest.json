@@ -1,0 +1,82 @@
+[
+  {
+    "file": "sample.txt",
+    "sentence": "问答通样例原文 TXT-7f3a 只出现在这个文本文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.md",
+    "sentence": "问答通样例原文 MD-7f3b 只出现在这个 Markdown 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.json",
+    "sentence": "问答通样例原文 JSON-7f3c 只出现在这个 JSON 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.csv",
+    "sentence": "问答通样例原文 CSV-7f3d 只出现在这个 CSV 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.html",
+    "sentence": "问答通样例原文 HTML-7f3e 只出现在这个 HTML 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.mhtml",
+    "sentence": "问答通样例原文 MHTML-7f3f 只出现在这个 MHTML 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.docx",
+    "sentence": "问答通样例原文 DOCX-7f40 只出现在这个 Word 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.pptx",
+    "sentence": "问答通样例原文 PPTX-7f41 只出现在这个演示文稿里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.xlsx",
+    "sentence": "问答通样例原文 XLSX-7f42 只出现在这个表格文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.pdf",
+    "sentence": "问答通样例原文 PDF-7f43 只出现在这个 PDF 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.epub",
+    "sentence": "问答通样例原文 EPUB-7f44 只出现在这本电子书里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.xmind",
+    "sentence": "问答通样例原文 XMIND-7f45 只出现在这张导图里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.doc",
+    "sentence": "问答通样例原文 DOC-7f46 只出现在这个旧版 Word 文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.xls",
+    "sentence": "问答通样例原文 XLS-7f48 只出现在这个旧版表格文件里。",
+    "expect": "content"
+  },
+  {
+    "file": "sample.png",
+    "sentence": "",
+    "expect": "status"
+  },
+  {
+    "file": "reject.mp4",
+    "sentence": "",
+    "expect": "rejected"
+  }
+]

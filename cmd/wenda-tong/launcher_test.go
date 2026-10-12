@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -193,6 +194,28 @@ func TestProvisionAllowsPublicChatURL(t *testing.T) {
 func TestEmptyBaseURLDoesNotInitialize(t *testing.T) {
 	if err := validateChatBaseURL(""); err == nil {
 		t.Fatal("empty base url should fail before any request")
+	}
+}
+
+func TestLoopbackOpenClosedPort(t *testing.T) {
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	addr := ln.Addr().String()
+	_ = ln.Close()
+	if err := loopbackOpen(addr); err == nil {
+		t.Fatal("closed port should stop start before the server process")
+	}
+}
+
+func TestOllamaWithoutBGEDoesNotProvision(t *testing.T) {
+	ollama := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"models":[{"name":"llama3:latest"}]}`))
+	}))
+	defer ollama.Close()
+	if err := checkOllamaModel(ollama.Client(), ollama.URL, "bge-m3"); err == nil {
+		t.Fatal("missing bge-m3 should fail before register")
 	}
 }
 
